@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>None</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript">
+
+/* Smart Select List v5.1 */
+/* Copyright 2007, Michael J. Hill. All rights reserved. Used with permission. www.javascript-demos.com */
+/* Free use of the code, so long as the above notice is kept intact */
+
+var smartOptions = [];
+var allOptions = [];
+var smartListName = "vipInfo"; // the name of the searched list;
+var searchInputName = "vipSearch" // the name of the text input used to search the smart list;
+
+function collectOrigData(nList){
+
+for (i=1; i<nList.length; i++)
+{
+nList.selectedIndex = i;
+allOptions[allOptions.length] = [nList.options[i].text,nList.value];
+}
+nList.selectedIndex = 0;	
+}
+
+function buildList(nForm,origData){
+
+for (i=0; i<origData.length; i++)
+{ 
+var nOption = document.createElement('option'); 
+nOption.value = origData[i][1]; 
+nOption.appendChild(document.createTextNode(origData[i][0])); 
+nForm[smartListName].appendChild(nOption); 
+}
+}
+
+function buildSmartOptions(nForm){
+
+var matchStr = nForm[searchInputName].value.toLowerCase();
+if (matchStr != "")
+{
+smartOptions.length = 0;
+for (i=0; i<allOptions.length; i++)
+{
+if (matchStr == allOptions[i][0].substring(0,matchStr.length).toLowerCase())
+{
+smartOptions[smartOptions.length] = [allOptions[i][0],allOptions[i][1]];
+}
+}
+nForm[smartListName].length = 1;
+for (i=0; i<smartOptions.length; i++)
+{
+buildList(nForm,smartOptions);
+}
+if (smartOptions.length > 5)
+{
+nForm[smartListName].size = 6;
+}
+else {
+nForm[smartListName].size = smartOptions.length + 1;
+}
+}
+if (matchStr == "")
+{
+rebuildOrigList();
+}
+}
+
+function getChoice(nChoice){
+
+if (nChoice != '')
+{
+alert(nChoice)
+}
+}
+
+function rebuildOrigList(){
+
+var nForm = document.forms[0];
+nForm[smartListName].options.length = 1;
+buildList(nForm,allOptions);	
+nForm[smartListName].size = 1;
+nForm[smartListName].selectedIndex = 0;	
+}
+
+function init(){
+
+var nForm = document.forms[0];	
+nForm[smartListName].onchange = function()
+{
+getChoice(this.value);
+}
+nForm[searchInputName].focus();
+nForm[searchInputName].onkeyup = function()
+{
+buildSmartOptions(this.form);
+}
+collectOrigData(nForm[smartListName]);	
+}
+
+navigator.appName == "Microsoft Internet Explorer" ? attachEvent('onload', init, false) : addEventListener('load', init, false);	
+
+</script>
+<style type="text/css">
+
+body {background-color: #f0fff0; margin-top: 65px; margin-bottom: 65px;}
+label {width: 200px; font-family: arial; font-size: 10pt;}
+select {width: 175px; font-family: arial; font-size: 10pt;}
+
+</style>
+</head>
+<body>
+<form action="">
+
+<label>Search List For: <input type="text" name="vipSearch"></label>
+
+<br><br>
+
+<select name="vipInfo" size="8" multiple >
+<option selected value="" >Make a Selection</option>
+<option value="1">Lee Bao Sheng</option>
+<option value="2">Tan Wei Qiang</option>
+<option value="3">Tan Yi Ning</option>
+<option value="4">Darryl Lee</option>
+<option value="5">Han Lynn</option>
+<option value="6"></option>
+<option value="7">Chan Wen Jun</option>
+<option value="8">Pei Jun Ming</option>
+<option value="9">Steve </option>
+</select>
+
+
+</form>
+</body>
+</html>

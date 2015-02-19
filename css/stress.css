@@ -1,0 +1,186 @@
+/*   Credit: http://www.templatemo.com   */
+
+body {
+	margin: 0;
+	padding: 0;
+	color: #666;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	line-height: 1.5em; 
+	background-color: #eeeff3; background-repeat: repeat-x; background-position: top
+}
+
+#stressBody { 
+	background-image: url(../images/templatemo_bg_home.png); 
+}
+
+#sub_page { 
+background-image: url(../images/templatemo_bg_sub.png); 
+}
+
+p { 
+	margin: 0 0 10px 0; 
+	padding: 0; 
+}
+
+img { border: none; }
+blockquote { font-style: italic; margin: 0 0 0 10px;}
+cite { font-weight: bold; color:#000; }
+cite a, cite a:link, cite a:visited  { font-weight: bold; color:#000; }
+cite span { font-weight: 400; color: #333; }
+em { color: #000; }
+
+h1, h2, h3, h4, h5, h6 { 
+	color: #000; 
+	font-weight: normal; 	
+	font-family: Georgia, "Times New Roman", Times, serif; 
+}
+
+h1 { font-size: 48px; margin: 0 0 30px; padding: 5px 0 ;color:#E5E4E2; }
+h2 { font-size: 38px; margin: 0 0 25px; padding: 5px 0; color:#E5E4E2;}
+h3 { font-size: 30px; margin: 0 0 20px; padding: 0; color:#E5E4E2; }
+h4 { font-size: 24px; margin: 0 0 15px; padding: 0}
+h5 { font-size: 20px; margin: 0 0 10px; padding: 0}
+h6 { font-size: 14px; margin: 0 0 5px; padding: 0;}
+
+.cleaner { clear: both }
+.h10 { height: 10px }
+.h20 { height: 20px }
+.h30 { height: 30px }
+.h40 { height: 40px }
+.h50 { height: 50px }
+.h60 { height: 60px }
+
+.float_l { float: left }
+.float_r { float: right }
+
+
+#wrapper { 
+	width: 960px; 
+	padding: 0 10px; 
+	margin: 0 auto; 
+}
+
+#top { 
+	height: 35px; 
+}
+
+#login { 
+	float: right; 
+	margin-top: 6px; 
+}
+
+
+#login .txt_field {
+	float: left;
+	display: block;
+	margin-left: 5px;
+	height: 22px;
+	width: 150px;
+	color: #c7c7c7;
+	font-size: 11px;
+	padding: 0 5px;
+	font-variant: normal;
+	line-height: normal;
+	background: url(../images/templatemo_login_txt.png) no-repeat;
+	border: none;	
+	line-height: 22px;
+}
+
+#login .sub_btn {
+	float: left;
+	display: block;
+	margin-left: 5px;	
+ 	height: 22px;
+	width: 70px;
+	cursor: pointer;
+	font-size: 12px;
+	text-align: center;
+	vertical-align: bottom;
+	white-space: pre;
+	color: #c7c7c7;
+	border: none;
+	background: url(../images/templatemo_login_btn.png)
+}
+
+#templatemo_header {
+	width: 960px;
+	height: 70px;
+}
+
+#site_title { 
+	position: absolute;
+	float: left; 
+	margin-top: 20px; 
+}
+
+#site_title h3 { 
+	margin: 0; 
+	padding: 0; 
+}
+
+#site_title h3 a { 
+	display: block; 
+	width: 203px; 
+	height: 33px; 
+	color: #fff; 
+	text-indent: -10000px; 
+}
+
+#templatemo_menu { 
+	float: right; 
+	margin-top: 20px; 
+}
+
+
+#templatemo_footer {
+	clear: both;
+	width: 960px;
+	padding: 30px 10px 15px;	
+	margin: 0 auto;
+	color: #666;
+	text-align: center;
+}
+
+#patientDetail{
+	border: 1px solid black;
+	position: absolute;
+	top:103px;
+	left: 2px;
+	width: 300px;
+	height: 300px;
+	color: #000000;
+}
+
+#history{
+	border: 1px solid black;
+	position: absolute;
+	top:407px;
+	left: 2px;
+	width: 300px;
+	height: 232px;
+}
+
+
+#pulseGraph{
+	border: 1px solid black;
+	position: absolute;
+	top:103px;
+	left: 307px;
+	width: 1055px;
+	height: 266px;
+	background-color: #34282C;
+	opacity:1;
+}
+
+
+#gsrGraph{
+	border: 1px solid black;
+	position: absolute;
+	top:373px;
+	left: 307px;
+	width: 1055px;
+	height: 266px;
+	background-color: #34282C;
+	opacity:1;
+}

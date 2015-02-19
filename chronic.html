@@ -1,0 +1,1421 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Stress Monitoring System</title>
+<meta name="keywords" content="graphite theme, professional, free templates, CSS, HTML" />
+<meta name="description" content="Graphite Theme, professional free CSS template from templatemo.com website" />
+<script type="text/javascript" src="smoothie.js"></script>
+<link rel="stylesheet" type="text/css" href="css/ddsmoothmenu.css" />
+<script language="javascript" type="text/javascript" src="jquery.js"></script>
+	<script language="javascript" type="text/javascript" src="jquery.flot.js"></script>
+	<script language="javascript" type="text/javascript" src="jquery.flot.resize.js"></script>
+
+
+<link href="css/Chronic.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body id="home" onload="init()">
+<div id="wrapper">
+	<div id="top">
+    	<div id="login">
+            <form action="#" method="get">
+              <input type="text" value="username" name="q" size="10" id="username" title="username" onfocus="clearText(this)" onblur="clearText(this)" class="txt_field" />
+              <input type="password" value="password" name="q" size="10" id="password" title="password" onfocus="clearText(this)" onblur="clearText(this)" class="txt_field" />
+              <input type="submit" name="Search" value="" alt="Search" id="searchbutton" title="Search" class="sub_btn"  />
+            </form>
+		</div>
+    </div> <!-- end of top -->
+    
+  	<div id="templatemo_header">
+    	<div id="site_title"></div>
+        <div id="templatemo_menu" class="ddsmoothmenu">
+            <ul>
+              	<li><a id ="indexTab" href="index.html" >Home</a></li>
+         		<li><a id="sportsTab" href="sports.html">Sport Training</a></li>
+              	<li><a id="chronicTab" href="chronic.html"class="selected">Chronic Disease</a></li>
+              	<li><a id="stressTab" href ="stress.html">Stress Monitoring</a></li>
+            </ul>
+            <br style="clear: left" />
+        </div> <!-- end of templatemo_menu -->
+    </div> <!-- end of header -->
+    </div>
+	<div id="invisiblebloodPressure" >
+	
+	
+ </div>
+ <div id="BPTitle">
+ <h4 id ="bpHeader" style="position:relative; top:0px; left:1px"></h4>
+ </div> 
+ 
+ <div id="bloodPressure">
+ 
+ <br>
+ 
+ </div>
+ <div id="RRTitle">
+  <h4  id="RRheader" style="position:relative; top:0px; left:1px"></h4>
+  </div> 
+ <div id="invisiblerespiratoryRate" >
+
+
+ 
+ </div>
+<div id="respiratoryRate" ><br>
+ 
+</div>
+<div id="SPTitle">
+<h4 id ="Spo2header" style="position:relative; top:0px; left:1px"></h4>
+</div>
+<div id="invisiblespo2" >
+</div>
+<div id="spo2"><br>
+</div>
+<div id="ecgTitle"></div>
+<div id="invisibleECG">
+<h4 id="ecgHeader" style="position:relative; top:0px; left:1px"></h4>
+ 
+ </div>
+<div id="ECG" ><br>
+
+
+</div>
+<div id="patientDetail">
+<h4 style="position:relative; top:5px; left:3px">Patient's Detail</h4>
+        <table style="font-size:15px; font-family: Georgia, 'Times New Roman', Times, serif">
+        <tr>
+          <td><div id="avatarDiv"></div></td>
+        </tr>
+        <tr>
+          <td>Name: </td>
+          <td><div id="nameDiv"></div></td>
+        </tr>
+        <tr>
+            <td>ID: </td>
+          <td><div id="idDiv"></div></td>
+        </tr>
+        <tr>
+            <td>Age: </td>
+          <td><div id="ageDiv"></div></td>
+        </tr>
+        <tr>
+            <td>In Charge: </td>
+          <td><div id="inchargeDiv"></div></td>
+        </tr>
+         <tr>
+            <td>Department: </td>
+          <td><div id="deptDiv"></div></td>
+        </tr>
+      </table>
+    
+
+
+</div>
+
+<div id="selectSensors">Please Select The Sensors:
+<form id="sensorForm">
+<table><tr>
+<td><input type="checkbox" name="sensors" id="spO2" value="Spo2">SpO2 & Pulse Rate<br></td>
+<td><input type="checkbox" name="sensors"  id="respiratoryrate" value="Respiratory Rate">Respiratory Rate<br></td>
+</tr><tr>
+<td><input type="checkbox" name="sensors" id="bloodpressure" value="Blood Pressure"style="overflow: auto;">Blood Pressure<br></td>
+<td><input type="checkbox" name="sensors" id="eCg" value="ECG">ECG<br></td>
+</tr></table>
+<button type="button" onclick="formReset()">Reset</button> <br>
+<button type="button" onclick="adjustGraph()">Save Settings</button>
+</form>
+</div>
+<div id="historyPage"><h4 style="position:relative; top:2px; left:3px">History</h4><br>
+</div>
+</body>
+<script  language="javascript" type="text/javascript">
+ 
+var counter = 0 ;
+function clear(field)
+{
+    if (field.defaultValue == field.value) field.value = '';
+    else if (field.value == '') field.value = field.defaultValue;
+}
+var patientArray = ["Han Lynn", "Jun Hou", "Tan Yi Ning", "Zhou Cihang", "Zhao Shan", "Wenjing", "Lilie"];
+var departmentArray = ["Sport Training", "Rehabilitation", "Chronic", "Stress Monitoring"];
+var pId;
+var spo2Reading;
+var rrReading;
+var bpReading;
+var ecgReading;
+var index;
+  
+/*
+      function createTimeline1() {
+	  var random1 = new TimeSeries();
+      setInterval(function() {
+        random1.append(new Date().getTime(), Math.random() * 10000);
+      }, 500);
+	  
+        var chart = new SmoothieChart();
+        chart.addTimeSeries(random1, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 4 });
+        chart.streamTo(document.getElementById("mycanvas1"), 500);
+      }
+	  */
+  
+  
+  $(function BPCHART() {
+
+		// We use an inline data source in the example, usually data would
+		// be fetched from a server
+
+		var data = [],
+			totalPoints = 300;
+		
+		function getRandomData() {
+
+			if (data.length > 0)
+				data = data.slice(1);
+
+			// Do a random walk
+
+			while (data.length < totalPoints) {
+
+				var prev = data.length > 0 ? data[data.length - 1] : 50,
+					y = prev + Math.random() * 10 - 5;
+
+				if (y < 0) {
+					y = 0;
+				} else if (y > 100) {
+					y = 100;
+				}
+				bpReading=y;
+				data.push(y);
+			}
+
+			// Zip the generated y values with the x values
+
+			var res = [];
+			for (var i = 0; i < data.length; ++i) {
+				res.push([i, data[i]])
+			}
+
+			return res;
+		}
+
+		// Set up the control widget
+
+		var updateInterval = 300;
+		$("#updateInterval").val(updateInterval).change(function () {
+			var v = $(this).val();
+			if (v && !isNaN(+v)) {
+				updateInterval = +v;
+				if (updateInterval < 1) {
+					updateInterval = 1;
+				} else if (updateInterval > 2000) {
+					updateInterval = 2000;
+				}
+				$(this).val("" + updateInterval);
+				
+			}
+		});
+
+		var plotF = $.plot("#bloodPressure", [ getRandomData() ], {
+			series: {
+				shadowSize: 0	// Drawing is faster without shadows
+			},
+			yaxis: {
+				min: 0,
+				max: 100
+			},
+			xaxis: {
+				show: false
+			}
+		});
+		
+		function update() {
+		var BPvalue = getRandomData();
+		/*document.getElementById("BPheader").innerHTML = BPText + BPvalue.toString();
+		setInterval(function(){},1000);*/
+
+			plotF.setData([BPvalue]);
+
+			// Since the axes don't change, we don't need to call plot.setupGrid()
+
+			plotF.draw();
+			setTimeout(update, updateInterval);
+			document.getElementById("BPTitle").innerHTML = "BP: " + parseInt(bpReading).toString()
+		}
+		
+		update();
+		
+
+		// Add the Flot version string to the footer
+
+		$("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+	});
+	
+	
+	$(function RESPIRATORYRATECHART() {
+
+		// We use an inline data source in the example, usually data would
+		// be fetched from a server
+
+		var data = [],
+			totalPoints = 300;
+		
+		function getRandomData() {
+
+			if (data.length > 0)
+				data = data.slice(1);
+
+			// Do a random walk
+
+			while (data.length < totalPoints) {
+
+				var prev = data.length > 0 ? data[data.length - 1] : 50,
+					y = prev + Math.random() * 10 - 5;
+
+				if (y < 0) {
+					y = 0;
+				} else if (y > 100) {
+					y = 100;
+				}
+				rrReading=y;
+				data.push(y);
+			}
+
+			// Zip the generated y values with the x values
+
+			var res = [];
+			for (var i = 0; i < data.length; ++i) {
+				res.push([i, data[i]])
+			}
+
+			return res;
+		}
+
+		// Set up the control widget
+
+		var updateInterval = 300;
+		$("#updateInterval").val(updateInterval).change(function () {
+			var v = $(this).val();
+			if (v && !isNaN(+v)) {
+				updateInterval = +v;
+				if (updateInterval < 1) {
+					updateInterval = 1;
+				} else if (updateInterval > 2000) {
+					updateInterval = 2000;
+				}
+				$(this).val("" + updateInterval);
+			}
+		});
+
+		var plotI = $.plot("#respiratoryRate", [ getRandomData() ], {
+			series: {
+				shadowSize: 0	// Drawing is faster without shadows
+			},
+			yaxis: {
+				min: 0,
+				max: 100
+			},
+			xaxis: {
+				show: false
+			}
+			
+			
+			
+		});
+		
+		
+
+		function update() {
+			
+			plotI.setData([getRandomData()]);
+
+			// Since the axes don't change, we don't need to call plot.setupGrid()
+
+			plotI.draw();
+			setTimeout(update, updateInterval);
+			document.getElementById("RRTitle").innerHTML = "Respiratory Rate: " + parseInt(rrReading).toString()
+		}
+		
+		update();
+
+		// Add the Flot version string to the footer
+
+		$("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	$(function SPO2CHART() {
+
+		// We use an inline data source in the example, usually data would
+		// be fetched from a server
+
+		var data = [],
+			totalPoints = 300;
+		
+		function getRandomData() {
+
+			if (data.length > 0)
+				data = data.slice(1);
+
+			// Do a random walk
+
+			while (data.length < totalPoints) {
+
+				var prev = data.length > 0 ? data[data.length - 1] : 50,
+					y = prev + Math.random() * 10 - 5;
+
+				if (y < 0) {
+					y = 0;
+				} else if (y > 100) {
+					y = 100;
+				}
+            spo2Reading=y;
+				data.push(y);
+			}
+
+			// Zip the generated y values with the x values
+
+			var res = [];
+			for (var i = 0; i < data.length; ++i) {
+				res.push([i, data[i]])
+			}
+
+			return res;
+		}
+
+		// Set up the control widget
+
+		var updateInterval = 300;
+		$("#updateInterval").val(updateInterval).change(function () {
+			var v = $(this).val();
+			if (v && !isNaN(+v)) {
+				updateInterval = +v;
+				if (updateInterval < 1) {
+					updateInterval = 1;
+				} else if (updateInterval > 2000) {
+					updateInterval = 2000;
+				}
+				$(this).val("" + updateInterval);
+			}
+		});
+
+		var plotE = $.plot("#spo2", [ getRandomData() ], {
+			series: {
+				shadowSize: 0	// Drawing is faster without shadows
+			},
+			yaxis: {
+				min: 0,
+				max: 100
+			},
+			xaxis: {
+				show: false
+			}
+			
+			
+			
+		});
+		
+		
+
+		function update() {
+
+			plotE.setData([getRandomData()]);
+
+			// Since the axes don't change, we don't need to call plot.setupGrid()
+
+			plotE.draw();
+			setTimeout(update, updateInterval);
+			document.getElementById("SPTitle").innerHTML = "SpO2: " + parseInt(spo2Reading).toString()
+		}
+		
+		update();
+
+		// Add the Flot version string to the footer
+
+		$("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+	});
+	
+  $(function ECGCHART() {
+
+		// We use an inline data source in the example, usually data would
+		// be fetched from a server
+
+		var data = [],
+			totalPoints = 300;
+		
+		function getRandomData() {
+
+			if (data.length > 0)
+				data = data.slice(1);
+
+			// Do a random walk
+
+			while (data.length < totalPoints) {
+
+				var prev = data.length > 0 ? data[data.length - 1] : 50,
+					y = prev + Math.random() * 10 - 5;
+
+				if (y < 0) {
+					y = 0;
+				} else if (y > 100) {
+					y = 100;
+				}
+               ecgReading=y;
+				data.push(y);
+			}
+
+			// Zip the generated y values with the x values
+
+			var res = [];
+			for (var i = 0; i < data.length; ++i) {
+				res.push([i, data[i]])
+			}
+
+			return res;
+		}
+
+		// Set up the control widget
+
+		var updateInterval = 300;
+		$("#updateInterval").val(updateInterval).change(function () {
+			var v = $(this).val();
+			if (v && !isNaN(+v)) {
+				updateInterval = +v;
+				if (updateInterval < 1) {
+					updateInterval = 1;
+				} else if (updateInterval > 2000) {
+					updateInterval = 2000;
+				}
+				$(this).val("" + updateInterval);
+			}
+		});
+
+		var plotE = $.plot("#ECG", [ getRandomData() ], {
+			series: {
+				shadowSize: 0	// Drawing is faster without shadows
+			},
+			yaxis: {
+				min: 0,
+				max: 100
+			},
+			xaxis: {
+				show: false
+			}
+			
+			
+			
+		});
+		
+		
+
+		function update() {
+
+			plotE.setData([getRandomData()]);
+
+			// Since the axes don't change, we don't need to call plot.setupGrid()
+
+			plotE.draw();
+			setTimeout(update, updateInterval);
+			document.getElementById("ecgTitle").innerHTML = "ECG: " + parseInt(ecgReading).toString()
+		}
+		
+		update();
+
+		// Add the Flot version string to the footer
+
+		$("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+	});
+		
+  
+  
+  
+  
+  
+  
+  
+
+  var P10001 = [{Name: 'Han Lynn',
+              ID : 10001,
+              Age: 20,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Stress Monitoring', 'Sport Monitoring'],
+              AvatarPath: 'images/patients/hanlynn.jpg'}];
+
+  var P10002 = [{Name: 'Jun Hou',
+              ID : 10002,
+              Age: 30,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Sport Monitoring'],
+              AvatarPath: 'images/patients/junhao.jpg'}];
+
+  var P10003 = [{Name: 'Tan Yi Ning',
+              ID : 10003,
+              Age: 23,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Chronic Disease'],
+              AvatarPath: 'images/patients/yining.jpg'}];
+
+
+  var patientDetail = [P10001, P10002, P10003];
+  var patientId;
+
+  
+  function getParam( name )
+{
+ name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+ var regexS = "[\\?&]"+name+"=([^&#]*)";
+ var regex = new RegExp( regexS );
+ var results = regex.exec( window.location.href );
+ if( results == null )
+  return "";
+else
+ return results[1];
+}
+
+  function init(){
+    patientId = getParam('pId');
+    index =  patientId - 10001;
+    if(patientId <10000){
+      alert("Please choose a patient to get access to this page.");
+      self.location='index.html';
+    }
+    else{
+      for(var i=0; i<patientDetail[index][0].Department.length;i++){
+        var text = patientDetail[index][0].Department[0];
+        if(text == document.getElementById("chronicTab").text){
+          displayDetail(); return;
+        }
+      }
+      alert("The patient does not take this package");
+      self.location="index.html";
+    }
+}
+
+  function addText(divID, text){
+    document.getElementById(divID).innerHTML = text;
+  }
+
+  function addHyperText(divID, array){
+    var x = document.getElementById(divID);
+    x.innerHTML = "";
+    for(var i=0;i<array.length;i++){
+      if(i>0)
+        x.innerHTML = x.innerHTML + ", ";
+
+      if(array[i]=="Sport Monitoring")
+         x.innerHTML = x.innerHTML + array[i].link("sports.html?pId="+document.getElementById("idDiv").innerHTML);
+      else if(array[i]=="Chronic Disease")
+         x.innerHTML = x.innerHTML + array[i].link("chronic.html?pId="+document.getElementById("idDiv").innerHTML);
+      else if(array[i]=="Stress Monitoring")
+         x.innerHTML = x.innerHTML + array[i].link("stress.html?pId="+document.getElementById("idDiv").innerHTML);
+    }
+  }
+
+  function showImage(divID, imageURL){
+    document.getElementById(divID).innerHTML = "<img src=" + "'" + imageURL + "'" + "/>";
+  }
+  function resetData(){
+      addText("nameDiv", "N/A");
+      addText("idDiv", "N/A");
+      addText("ageDiv","N/A");
+      addText("inchargeDiv", "N/A");
+      addText("deptDiv", "N/A");
+  }
+
+ function showImage(divID, imageURL){
+    document.getElementById(divID).innerHTML = "<img src=" + "'" + imageURL + "'" + "/>";
+  }
+  function displayDetail(){
+    var id = patientId - 10001;
+    if(id>=patientDetail.length){
+      addText("avatarDiv", "No information available");
+      resetData();
+    }else{
+      showImage("avatarDiv", patientDetail[index][0].AvatarPath)
+      addText("nameDiv", patientDetail[index][0].Name);
+      addText("idDiv", patientDetail[index][0].ID);
+      addText("ageDiv", patientDetail[index][0].Age);
+      addText("inchargeDiv", patientDetail[index][0].InCharge);
+      addHyperText("deptDiv", patientDetail[index][0].Department);
+    }
+
+  }
+  function resetData(){
+      addText("nameDiv", "N/A");
+      addText("idDiv", "N/A");
+      addText("ageDiv","N/A");
+      addText("inchargeDiv", "N/A");
+      addText("deptDiv", "N/A");
+  }
+
+
+  function displayDetail(){
+    var id = patientId - 10001;
+    if(id>=patientDetail.length){
+      addText("avatarDiv", "No information available");
+      resetData();
+    }else{
+      showImage("avatarDiv", patientDetail[id][0].AvatarPath)
+      addText("nameDiv", patientDetail[id][0].Name);
+      addText("idDiv", patientDetail[id][0].ID);
+      addText("ageDiv", patientDetail[id][0].Age);
+      addText("inchargeDiv", patientDetail[id][0].InCharge);
+      addHyperText("deptDiv", patientDetail[id][0].Department);
+	  changeHref("stressTab","stress.html?pId="+ (patientDetail[index][0].ID).toString());
+      changeHref("sportsTab","sports.html?pId="+ (patientDetail[index][0].ID).toString());
+      changeHref("chronicTab","chronic.html?pId="+ (patientDetail[index][0].ID).toString());
+    }
+
+  }
+  function addHyperText(divID, array){
+    var x = document.getElementById(divID);
+    x.innerHTML = "";
+    for(var i=0;i<array.length;i++){
+      if(i>0)
+        x.innerHTML = x.innerHTML + ", ";
+
+      if(array[i]=="Sport Monitoring")
+         x.innerHTML = x.innerHTML + array[i].link("sports.html?pId="+document.getElementById("idDiv").innerHTML);
+      else if(array[i]=="Chronic Disease")
+         x.innerHTML = x.innerHTML + array[i].link("chronic.html?pId="+document.getElementById("idDiv").innerHTML);
+      else if(array[i]=="Stress Monitoring")
+         x.innerHTML = x.innerHTML + array[i].link("stress.html?pId="+document.getElementById("idDiv").innerHTML);
+    }
+  }
+  
+  function changeHref(divId, value){
+    document.getElementById(divId).href = value;
+  }
+
+function formReset()
+{
+document.getElementById("sensorForm").reset();
+var  BloodPressure = document.getElementById('bloodPressure').style;
+var  RespiratoryRate = document.getElementById('respiratoryRate').style;
+var SPO2 = document.getElementById('spo2').style;
+var ECG = document.getElementById('ECG').style;
+RespiratoryRate.display="block";
+		ECG.display = "block";
+		BloodPressure.display="block";
+		SPO2.display = "block";
+	    
+		 BloodPressure.top =  372 + "px";
+		BloodPressure.width = 520 + "px";
+		BloodPressure.height = 265  + "px";
+		
+	    ECG.top =  372 + "px";
+		ECG.width = 520 + "px";
+		ECG.height = 265  + "px";
+		ECG.left= 830 + "px";
+		
+		SPO2.top =  103 + "px";
+		SPO2.width = 520 + "px";
+		SPO2.height = 265  + "px";
+		
+		
+		 RespiratoryRate.top =  103 + "px";
+		RespiratoryRate.width = 520 + "px";
+		RespiratoryRate.height = 265  + "px";
+		RespiratoryRate.left = 830 + "px";
+		
+}
+
+
+
+function adjustGraph(){
+var str="";
+var  BloodPressure = document.getElementById('bloodPressure').style;
+var  RespiratoryRate = document.getElementById('respiratoryRate').style;
+var SPO2 = document.getElementById('spo2').style;
+var ECG = document.getElementById('ECG').style;
+
+var  IBloodPressure = document.getElementById('invisiblebloodPressure').style;
+var  IRespiratoryRate = document.getElementById('invisiblerespiratoryRate').style;
+var ISPO2 = document.getElementById('invisiblespo2').style;
+var IECG = document.getElementById('invisibleECG').style;
+
+var RR = document.getElementById("RRTitle").style;
+var SP02 = document.getElementById("SPTitle").style;
+var ecg = document.getElementById("ecgTitle").style;
+var bp = document.getElementById("BPTitle").style;
+
+
+
+	//stores string to variable string for selection check
+		if(document.getElementById('bloodpressure').checked){
+		str=str+"B";
+		
+		}
+	
+		if(document.getElementById('respiratoryrate').checked){
+		str=str+"R";
+		}
+	
+		if(document.getElementById("spO2").checked){
+		str=str+"S";
+		}
+	   if(document.getElementById("eCg").checked){
+		str=str+"E";
+		}
+		
+		
+		
+		
+		//selection check
+		if (str=="B"){
+		alert("Blood Pressure");
+		
+		RespiratoryRate.display = "none";
+		SPO2.display = "none";		
+		ECG.display = "none";
+		BloodPressure.display="block";
+		
+		
+        BloodPressure.top = 123 + "px";
+		BloodPressure.width = 1040 + "px";
+		BloodPressure.height = 520  + "px";
+		BloodPressure.left = 306  + "px";
+		
+		IBloodPressure.top = 103 + "px";
+		IBloodPressure.width = 1040 + "px";
+		IBloodPressure.height = 520  + "px";
+		IBloodPressure.left = 306  + "px";
+		
+		RR.display="none";
+		SP02.display="none";
+		ecg.display="none";
+		
+		bp.top= 103+"px";
+		
+IRespiratoryRate.display="none";
+ 
+ISPO2.display="none";
+IECG.display="none";
+			
+        }
+		
+		
+    
+		if (str=="BR"){
+		alert("Blood Pressure and Respiratory Rate");
+		
+		SPO2.display = "none";		
+		ECG.display = "none";
+		BloodPressure.display="block";
+		RespiratoryRate.display = "block";
+		
+       RespiratoryRate.top = 123 + "px";
+		RespiratoryRate.width = 1040 + "px";
+		RespiratoryRate.height = 230  + "px";
+		RespiratoryRate.left =  306 + "px";
+		
+		IRespiratoryRate.top = 103 + "px";
+		IRespiratoryRate.width = 1040 + "px";
+		IRespiratoryRate.height = 265  + "px";
+		IRespiratoryRate.left =  306 + "px";
+		
+		IBloodPressure.top = 350 + "px";
+		IBloodPressure.width = 1040 + "px";
+		IBloodPressure.height = 265  + "px";
+		IBloodPressure.left = 306  + "px";
+		
+		BloodPressure.top =  365 + "px";
+		BloodPressure.width = 1040 + "px";
+		BloodPressure.height = 230  + "px";
+		BloodPressure.left = 306  + "px";
+		IRespiratoryRate.display="true";
+		
+		SP02.display="none";
+		ecg.display="none";
+		
+		RR.left=306+"px";
+		bp.top=350+"px";
+		}
+		
+		
+		if (str=="BS"){
+		alert("Blood Pressure and SpO2");
+		
+		ECG.display = "none";	
+		RespiratoryRate.display = "none";
+		BloodPressure.display="block";
+		SPO2.display = "block";
+		
+		
+       BloodPressure.top =  372 + "px";
+		BloodPressure.width = 1040 + "px";
+		BloodPressure.height = 230  + "px";
+		
+		IBloodPressure.top =  350 + "px";
+		IBloodPressure.width = 1040 + "px";
+		IBloodPressure.height = 265  + "px";
+		
+		SPO2.top =  123 + "px";
+		SPO2.width = 1040 + "px";
+		SPO2.height = 230 + "px";
+		
+		ISPO2.top =  103 + "px";
+		ISPO2.width = 1040 + "px";
+		ISPO2.height = 265 + "px";
+		
+		bp.top=350+"px";
+		RR.display="none";
+		ecg.display="none";
+		
+		}
+		if (str=="BE"){
+		alert("Blood Pressure and ECG");
+		
+		RespiratoryRate.display = "none";	
+		SPO2.display = "none";	
+		BloodPressure.display="block";
+		ECG.display = "block";
+		
+		
+        BloodPressure.top =  372 + "px";
+		BloodPressure.width = 1040 + "px";
+		BloodPressure.height = 230  + "px";
+		
+		IBloodPressure.top =  350 + "px";
+		IBloodPressure.width = 1040 + "px";
+		IBloodPressure.height = 265  + "px";
+		
+		ECG.top =  123 + "px";
+		ECG.width = 1040 + "px";
+		ECG.height = 230  + "px";
+		ECG.left = 306  + "px";
+		
+		IECG.top =  103 + "px";
+		IECG.width = 1040 + "px";
+		IECG.height = 265  + "px";
+		IECG.left = 306  + "px";
+		
+		bp.top=350+"px";
+		
+		ecg.top= 103+"px";
+		ecg.left=306+"px";
+		
+		RR.display="none";
+		SP02.display="none";
+		}
+		
+		
+		
+		if (str=="R"){
+		alert("Respiratory Rate");	
+		SPO2.display = "none";
+		ECG.display = "none";
+		BloodPressure.display="none";
+		RespiratoryRate.display="block";
+		
+		
+		RespiratoryRate.top =  123 + "px";
+		RespiratoryRate.width = 1040 + "px";
+		RespiratoryRate.height = 520  + "px";
+		RespiratoryRate.left = 306  + "px";
+		
+		IRespiratoryRate.top =  103 + "px";
+		IRespiratoryRate.width = 1040 + "px";
+		IRespiratoryRate.height = 520  + "px";
+		IRespiratoryRate.left = 306  + "px";
+		
+		RR.top=103+"px";
+		RR.left=306+"px";
+		
+		bp.display="none";
+		SP02.display="none";
+		ecg.display="none";
+		
+		
+		}
+		
+		
+		if (str=="RS"){
+		alert("Respiratory Rate and Spo2");
+		
+		BloodPressure.display="none";
+		ECG.display = "none";
+		RespiratoryRate.display="block";
+		SPO2.display = "block";
+		
+		RespiratoryRate.top =  123 + "px";
+		RespiratoryRate.width = 1040 + "px";
+		RespiratoryRate.height = 230  + "px";
+		RespiratoryRate.left = 306  + "px";
+		
+		IRespiratoryRate.top =  103 + "px";
+		IRespiratoryRate.width = 1040 + "px";
+		IRespiratoryRate.height = 265  + "px";
+		IRespiratoryRate.left = 306  + "px";
+		
+		SPO2.top = 372 + "px";
+		SPO2.width = 1040+ "px";
+		SPO2.height = 230  + "px";
+		
+		ISPO2.top = 350 + "px";
+		ISPO2.width = 1040+ "px";
+		ISPO2.height = 265  + "px";
+		
+		bp.display="none";
+		ecg.display="none";
+		
+		RR.top=350+"px";
+		RR.left=306+"px";
+		
+		}
+		
+		
+		if(str=="RE"){
+		alert("Respiratory Rate and ECG");
+		
+		BloodPressure.display="none";
+		SPO2.display = "none";
+		RespiratoryRate.display="block";
+		ECG.display = "block";
+		
+	   RespiratoryRate.top =  123 + "px";
+		RespiratoryRate.width = 1040 + "px";
+		RespiratoryRate.height = 230  + "px";
+		RespiratoryRate.left = 306  + "px";
+		
+		IRespiratoryRate.top =  103 + "px";
+		IRespiratoryRate.width = 1040 + "px";
+		IRespiratoryRate.height = 265  + "px";
+		IRespiratoryRate.left = 306  + "px";
+		
+		ECG.top =  372 + "px";
+		ECG.width = 1040 + "px";
+		ECG.height = 230  + "px";
+		ECG.left = 306  + "px";
+		
+		IECG.top =  350 + "px";
+		IECG.width = 1040 + "px";
+		IECG.height = 265  + "px";
+		IECG.left = 306  + "px";
+		
+		bp.display="none";
+		SP02.display="none";
+		
+		RR.left=306+"px";
+		ecg.left=306+"px";
+		ecg.top=350+"px";
+		
+		}
+		
+		if(str=="E"){
+		alert("ECG");
+		
+		BloodPressure.display="none";
+		SPO2.display = "none";
+		RespiratoryRate.display = "none";
+		ECG.display = "block";
+		
+		ECG.top =  123 + "px";
+		ECG.width = 1040 + "px";
+		ECG.height = 530  + "px";
+		ECG.left = 306  + "px";
+		
+		IECG.top =  103 + "px";
+		IECG.width = 1040 + "px";
+		IECG.height = 530  + "px";
+		IECG.left = 306  + "px";
+		
+		bp.display="none";
+		SP02.display="none";
+		RR.display="none";
+		
+		}
+		if(str=="SE"){
+		alert("ECG and Spo2");
+		
+		BloodPressure.display="none";
+		RespiratoryRate.display = "none";
+		SPO2.display="block";
+		ECG.display = "block";
+		
+	   ECG.top =  120 + "px";
+		ECG.width = 1040 + "px";
+		ECG.height = 230  + "px";
+		ECG.left = 306  + "px";
+		
+		 IECG.top =  103 + "px";
+		IECG.width = 1040 + "px";
+		IECG.height = 265  + "px";
+		IECG.left = 306  + "px";
+		
+		SPO2.top = 372 + "px";
+		SPO2.width = 1040 + "px";
+		SPO2.height = 230  + "px";
+		
+		ISPO2.top = 350 + "px";
+		ISPO2.width = 1040 + "px";
+		ISPO2.height = 265  + "px";
+		
+		bp.display="none";
+		RR.display="none";
+		
+		ecg.left=306+"px";
+		ecg.top=350+'px';
+		
+		}
+		
+		if(str=="S"){
+		alert("Spo2");
+		
+		BloodPressure.display="none";
+		ECG.display = "none";
+		RespiratoryRate.display = "none";
+		SPO2.display="block";
+		
+		
+	    SPO2.top =  123 + "px";
+		SPO2.width = 1040 + "px";
+		SPO2.height = 530  + "px";
+		SPO2.left = 306  + "px";
+		
+		 ISPO2.top =  103 + "px";
+		ISPO2.width = 1040 + "px";
+		ISPO2.height = 530  + "px";
+		ISPO2.left = 306  + "px";
+		
+		
+		bp.display="none";
+		RR.display="none";
+		ecg.display = "none";
+		}
+		
+		if(str=="BRS"){
+		alert("Blood Pressure, Respiratory Rate,Spo2");
+		ECG.display = "none";
+		BloodPressure.display="block";
+		RespiratoryRate.display = "block";
+		SPO2.display="block";
+		
+		
+	    BloodPressure.top =  372 + "px";
+		BloodPressure.width = 1040 + "px";
+		BloodPressure.height = 230  + "px";
+		
+		IBloodPressure.top =  350 + "px";
+		IBloodPressure.width = 1040 + "px";
+		IBloodPressure.height = 265  + "px";
+		
+		RespiratoryRate.top =  123 + "px";
+		RespiratoryRate.width = 520 + "px";
+		RespiratoryRate.height = 230  + "px";
+		RespiratoryRate.left = 830  + "px";
+		
+		IRespiratoryRate.top =  103 + "px";
+		IRespiratoryRate.width = 520 + "px";
+		IRespiratoryRate.height = 230  + "px";
+		IRespiratoryRate.left = 830  + "px";
+		
+		 SPO2.top =  123 + "px";
+		SPO2.width = 520 + "px";
+		SPO2.height = 230  + "px";
+		SPO2.left = 306  + "px";
+		
+		ISPO2.top =  103 + "px";
+		ISPO2.width = 520 + "px";
+		ISPO2.height = 230  + "px";
+		ISPO2.left = 306  + "px";
+		bp.top=350+"px";
+		
+		ecg.display = "none";
+		
+		}
+		if(str=="BRE"){
+		alert("Blood Pressure, Respiratory Rate,ECG");
+		SPO2.display = "none";
+		BloodPressure.display="block";
+		ECG.display = "block";
+		RespiratoryRate.display="block";
+		
+		
+	   BloodPressure.top =  372 + "px";
+		BloodPressure.width = 1040 + "px";
+		BloodPressure.height = 230  + "px";
+		
+		IBloodPressure.top =  350 + "px";
+		IBloodPressure.width = 1040 + "px";
+		IBloodPressure.height = 265  + "px";
+		
+		
+		RespiratoryRate.top =  123 + "px";
+		RespiratoryRate.width = 520 + "px";
+		RespiratoryRate.height = 230  + "px";
+		RespiratoryRate.left = 306  + "px";
+		
+		IRespiratoryRate.top =  103 + "px";
+		IRespiratoryRate.width = 520 + "px";
+		IRespiratoryRate.height = 230  + "px";
+		IRespiratoryRate.left = 306  + "px";
+		
+		ECG.left = 306  + "px";
+		ECG.top =  123 + "px";
+		ECG.width = 520 + "px";
+		ECG.height = 230  + "px";
+		ECG.left = 830 + "px";
+		
+		IECG.left = 306  + "px";
+		IECG.top =  103 + "px";
+		IECG.width = 520 + "px";
+		IECG.height = 230  + "px";
+		IECG.left = 830 + "px";
+	
+	SP02.display="none";
+	
+	ecg.top=103+"px";
+	ecg.left=306+"px";
+	bp.top=350+"px";
+		
+		}
+		if(str=="BSE"){
+		alert("Blood Pressure,Spo2,ECG");
+	    RespiratoryRate.display = "none";
+		BloodPressure.display="block";
+		ECG.display = "block";
+		SPO2.display="block";
+		
+		 BloodPressure.top =  372 + "px";
+		BloodPressure.width = 1040 + "px";
+		BloodPressure.height = 230  + "px";
+		
+		IBloodPressure.top =  350 + "px";
+		IBloodPressure.width = 1040 + "px";
+		IBloodPressure.height = 265  + "px";
+		
+		
+		 SPO2.top =  123 + "px";
+		SPO2.width = 520 + "px";
+		SPO2.height = 230  + "px";
+		SPO2.left = 306  + "px";
+		
+		ISPO2.top =  103 + "px";
+		ISPO2.width = 520 + "px";
+		ISPO2.height = 230  + "px";
+		ISPO2.left = 306  + "px";
+		
+		ECG.left = 306  + "px";
+		ECG.top =  123 + "px";
+		ECG.width = 520 + "px";
+		ECG.height = 230  + "px";
+		ECG.left = 830 + "px";
+		
+		IECG.left = 306  + "px";
+		IECG.top =  103 + "px";
+		IECG.width = 520 + "px";
+		IECG.height = 265  + "px";
+		IECG.left = 830 + "px";
+		
+		RR.display="none";
+		
+		ecg.top=103+"px";
+		ecg.left=830+"px";
+		bp.top=350+"px";
+		
+		}
+		if(str=="RSE"){
+		alert("Respiratory rate,Spo2,ECG");
+	    BloodPressure.display = "none";
+		RespiratoryRate.display="block";
+		ECG.display = "block";
+		SPO2.display="block";
+		
+		
+	    ECG.top =  372 + "px";
+		ECG.width = 1040 + "px";
+		ECG.height = 230  + "px";
+		
+		IECG.top =  350 + "px";
+		IECG.width = 1040 + "px";
+		IECG.height = 230  + "px";
+		
+		SPO2.top =  123 + "px";
+		SPO2.width = 520 + "px";
+		SPO2.height = 230  + "px";
+		ECG.left = 306  + "px";
+		
+		ISPO2.top =  103 + "px";
+		ISPO2.width = 520 + "px";
+		ISPO2.height = 230  + "px";
+		IECG.left = 306  + "px";
+		
+		 RespiratoryRate.top =  123 + "px";
+		RespiratoryRate.width = 520 + "px";
+		RespiratoryRate.height = 230  + "px";
+		RespiratoryRate.left = 830 + "px";
+		
+		IRespiratoryRate.top =  103 + "px";
+		IRespiratoryRate.width = 520 + "px";
+		IRespiratoryRate.height = 230  + "px";
+		IRespiratoryRate.left = 830 + "px";
+		
+		bp.display="none"; 
+		ecg.left=306+"px";
+		ecg.top=350+"px";
+		}
+		if(str=="BRSE"){
+		alert("ALL");
+		RespiratoryRate.display="block";
+		ECG.display = "block";
+		BloodPressure.display="block";
+		SPO2.display = "block";
+	    
+		 BloodPressure.top =  372 + "px";
+		BloodPressure.width = 520 + "px";
+		BloodPressure.height = 230  + "px";
+		
+		 IBloodPressure.top =  350 + "px";
+		IBloodPressure.width = 520 + "px";
+		IBloodPressure.height = 230  + "px";
+		
+	    ECG.top =  372 + "px";
+		ECG.width = 520 + "px";
+		ECG.height = 230  + "px";
+		ECG.left= 830 + "px";
+		
+		 IECG.top =  350 + "px";
+		IECG.width = 520 + "px";
+		IECG.height = 230  + "px";
+		IECG.left= 830 + "px";
+		
+		SPO2.top =  123 + "px";
+		SPO2.width = 520 + "px";
+		SPO2.height = 230  + "px";
+		
+		ISPO2.top =  103 + "px";
+		ISPO2.width = 520 + "px";
+		ISPO2.height = 230 + "px";
+		
+		
+		 RespiratoryRate.top =  123 + "px";
+		RespiratoryRate.width = 520 + "px";
+		RespiratoryRate.height = 230  + "px";
+		RespiratoryRate.left = 830 + "px";
+		
+		 IRespiratoryRate.top =  103 + "px";
+		IRespiratoryRate.width = 520 + "px";
+		IRespiratoryRate.height = 230 + "px";
+		IRespiratoryRate.left = 830 + "px";
+		
+		bp.top=350+"px";
+		ecg.top=350+"px";
+		}
+		
+		
+		
+		
+		
+	}
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+/*
+function adjustableGraph()
+{
+if(document.getElementById("bloodpressure").checked){
+
+document.getElementById("ECG").style.visibility="hidden";
+document.getElementById('bloodPressure').style.width = '950px';
+
+}
+
+if ( document.getElementById("respiratoryrate").checked )
+{
+document.getElementById("spo2").style.visibility="hidden";
+document.getElementById("respiratoryRate").style.visibility="visible";
+document.getElementById("bloodPressure").style.visibility="hidden";
+document.getElementById("ECG").style.visibility="hidden";
+document.getElementById("respiratoryRate").style.left = "400px";  
+document.getElementById('respiratoryRate').style.width = '950px';
+document.getElementById('respiratoryRate').style.height = '530px';
+
+
+
+}
+if ( document.getElementById("spO2").checked )
+{
+document.getElementById("respiratoryRate").style.visibility="hidden";
+document.getElementById('spo2').style.width = '950px';
+document.getElementById('spo2').style.height = '530px';
+document.getElementById("bloodPressure").style.visibility="hidden";
+document.getElementById("ECG").style.visibility="hidden";
+}
+if ( document.getElementById("eCg").checked )
+{
+document.getElementById("bloodPressure").style.visibility="hidden";
+document.getElementById("invisibleEcg").style.visibility="visible";
+document.getElementById("ECG").style.visibility="hidden";
+}
+
+if(document.getElementById("bloodpressure").checked &&  document.getElementById("respiratoryrate").checked && document.getElementById("spO2").checked && document.getElementById("spO2").checked )
+{
+document.getElementById("spo2").style.visibility="visible";
+document.getElementById("respiratoryRate").style.visibility="visible";
+document.getElementById("invisibleRespiration").style.visibility="hidden";
+
+}
+
+if(document.getElementById("spO2").checked &&  document.getElementById("eCg").checked && document.getElementById("bloodpressure").checked )
+{
+document.getElementById('spo2').style.width = '950px';
+document.getElementById("spo2").style.visibility="visible";
+document.getElementById("respiratoryRate").style.visibility="hidden";
+document.getElementById("invisibleEcg").style.visibility="hidden";
+document.getElementById("ECG").style.visibility="visible";
+document.getElementById("bloodPressure").style.visibility="visible";
+}
+if(document.getElementById("bloodpressure").checked &&  document.getElementById("respiratoryrate").checked && document.getElementById("eCg").checked)
+{
+document.getElementById("bloodPressure").style.visibility="visible";
+document.getElementById("ECG").style.visibility="visible";
+document.getElementById("invisibleEcg").style.visibility="hidden";
+document.getElementById("invisibleRespiration").style.visibility="visible";
+document.getElementById("respiratoryRate").style.visibility="hidden";
+document.getElementById("spo2").style.visibility="hidden";
+}
+if(document.getElementById("bloodpressure").checked &&  document.getElementById("respiratoryrate").checked && document.getElementById("eCg").checked && document.getElementById("spO2").checked )
+{
+document.getElementById("spo2").style.visibility="visible";
+document.getElementById("respiratoryRate").style.visibility="visible";
+document.getElementById("invisibleRespiration").style.visibility="hidden";
+
+}
+if(document.getElementById("spO2").checked &&  document.getElementById("eCg").checked && document.getElementById("respiratoryrate").checked)
+{
+document.getElementById("spo2").style.visibility="visible";
+document.getElementById("invisibleRespiration").style.visibility="hidden";
+document.getElementById("respiratoryRate").style.visibility="visible";
+
+
+}
+}*/
+
+</script>
+</html>

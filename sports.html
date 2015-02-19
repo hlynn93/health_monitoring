@@ -1,0 +1,844 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Sports Training</title>
+<meta name="keywords" content="graphite theme, professional, free templates, CSS, HTML" />
+<meta name="description" content="Graphite Theme, professional free CSS template from templatemo.com website" />
+<link href="css/sports.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" type="text/css" href="css/ddsmoothmenu.css" /> 
+	<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../../excanvas.min.js"></script><![endif]-->
+	<script language="javascript" type="text/javascript" src="jquery.js"></script>
+	<script language="javascript" type="text/javascript" src="jquery.flot.js"></script>
+	<script language="javascript" type="text/javascript" src="jquery.flot.resize.js"></script>
+	<script type="text/javascript">
+	
+	var patientArray = ["Han Lynn", "Jun Hou", "Tan Yi Ning", "Zhou Cihang", "Zhao Shan", "Wenjing", "Lilie"];
+  var departmentArray = ["Sports Training", "Rehabilitation", "Chronic", "Stress Monitoring"];
+  var pId;
+
+
+  var P10001 = [{Name: 'Han Lynn',
+              ID : 10001,
+              Age: 20,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Stress Monitoring', 'Sport Monitoring'],
+              AvatarPath: 'images/patients/hanlynn.jpg'}];
+
+  var P10002 = [{Name: 'Jun Hou',
+              ID : 10002,
+              Age: 30,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Sports Training'],
+              AvatarPath: 'images/patients/junhao.jpg'}];
+
+  var P10003 = [{Name: 'Tan Yi Ning',
+              ID : 10003,
+              Age: 23,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Chronic Disease'],
+              AvatarPath: 'images/patients/yining.jpg'}];
+
+
+  var patientDetail = [P10001, P10002, P10003];
+  var patientId;
+
+ 
+
+ function getParam( name )
+{
+ name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+ var regexS = "[\\?&]"+name+"=([^&#]*)";
+ var regex = new RegExp( regexS );
+ var results = regex.exec( window.location.href );
+ if( results == null )
+  return "";
+else
+ return results[1];
+}
+
+  function init(){
+    patientId = getParam('pId');
+    index =  patientId - 10001;
+    if(patientId <10000){
+      alert("Please choose a patient to get access to this page.");
+      self.location='index.html';
+    }
+    else{
+      for(var i=0; i<patientDetail[index][0].Department.length;i++){
+	  
+        var text = patientDetail[index][0].Department[0];
+      
+	  if(text == document.getElementById("sportsTab").text){
+	 
+          displayDetail(); return;
+        }
+	
+      }
+      alert("The patient does not take this package");
+      self.location("index.html");
+	  
+
+    }
+  }
+
+  function addText(divID, text){
+    document.getElementById(divID).innerHTML = text;
+  }
+
+  function addHyperText(divID, array){
+    var x = document.getElementById(divID);
+    x.innerHTML = "";
+    for(var i=0;i<array.length;i++){
+      if(i>0)
+        x.innerHTML = x.innerHTML + ", ";
+
+      if(array[i]=="Sports Training")
+         x.innerHTML = x.innerHTML + array[i].link("sports.html?pId="+document.getElementById("idDiv").innerHTML);
+      else if(array[i]=="Chronic Disease")
+         x.innerHTML = x.innerHTML + array[i].link("chronic.html?pId="+document.getElementById("idDiv").innerHTML);
+      else if(array[i]=="Stress Monitoring")
+         x.innerHTML = x.innerHTML + array[i].link("stress.html?pId="+document.getElementById("idDiv").innerHTML);
+    }
+  }
+
+
+  function showImage(divID, imageURL){
+    document.getElementById(divID).innerHTML = "<img src=" + "'" + imageURL + "'" + "/>";
+  }
+  
+
+  function resetData(){
+      addText("nameDiv", "N/A");
+      addText("idDiv", "N/A");
+      addText("ageDiv","N/A");
+      addText("inchargeDiv", "N/A");
+      addText("deptDiv", "N/A");
+  }
+
+//change the href of a link
+  function changeHref(divId, value){
+    document.getElementById(divId).href = value;
+  }
+
+//Display the patient's detail and show the graphs
+  function displayDetail(){
+
+    
+    if(index>=patientDetail.length){ //check whether the patient is in the registered list
+      addText("avatarDiv", "No information available");
+      resetData();
+    }else{
+      showImage("avatarDiv", patientDetail[index][0].AvatarPath)
+      addText("nameDiv", patientDetail[index][0].Name);
+      addText("idDiv", patientDetail[index][0].ID);
+      addText("ageDiv", patientDetail[index][0].Age);
+      addText("inchargeDiv", patientDetail[index][0].InCharge);
+      addHyperText("deptDiv", patientDetail[index][0].Department);
+      changeHref("stressTab","stress.html?pId="+ (patientDetail[index][0].ID).toString());
+      changeHref("sportsTab","sports.html?pId="+ (patientDetail[index][0].ID).toString());
+      changeHref("chronicTab","chronic.html?pId="+ (patientDetail[index][0].ID).toString());
+    }
+
+    
+  }
+var xAxisReadings;	
+var yAxisReadings;	
+var zAxisReadings;
+	
+var forceReadings;	
+var emgReadings;	
+	$(function FORCECHART() {
+
+		// We use an inline data source in the example, usually data would
+		// be fetched from a server
+
+		var data = [],
+			totalPoints = 300;
+		
+		function getRandomData() {
+
+			if (data.length > 0)
+				data = data.slice(1);
+
+			// Do a random walk
+
+			while (data.length < totalPoints) {
+
+				var prev = data.length > 0 ? data[data.length - 1] : 50,
+					y = prev + Math.random() * 10 - 5;
+					
+				if (y < 0) {
+					y = 0;
+				} else if (y > 100) {
+					y = 100;
+				}
+					
+				data.push(y);
+				forceReadings=y;	
+			}
+
+			// Zip the generated y values with the x values
+
+			var res = [];
+			for (var i = 0; i < data.length; ++i) {
+				res.push([i, data[i]])
+			}
+
+			return res;
+		}
+
+		// Set up the control widget
+
+		var updateInterval = 300;
+		$("#updateInterval").val(updateInterval).change(function () {
+			var v = $(this).val();
+			if (v && !isNaN(+v)) {
+				updateInterval = +v;
+				if (updateInterval < 1) {
+					updateInterval = 1;
+				} else if (updateInterval > 2000) {
+					updateInterval = 2000;
+				}
+				$(this).val("" + updateInterval);
+			}
+		});
+
+		var plotF = $.plot("#ForceDiv", [ getRandomData() ], {
+			series: {
+				shadowSize: 0	// Drawing is faster without shadows
+			},
+			yaxis: {
+				min: 0,
+				max: 100
+			},
+			xaxis: {
+				show: false
+			}
+			
+			
+			
+		});
+		
+		
+
+		function update() {
+
+			plotF.setData([getRandomData()]);
+
+			// Since the axes don't change, we don't need to call plot.setupGrid()
+
+			plotF.draw();
+			setTimeout(update, updateInterval);
+			document.getElementById("forcevalue").innerHTML = "Force:" + parseInt(forceReadings).toString()
+		}
+		
+		update();
+
+		// Add the Flot version string to the footer
+
+		$("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+	});
+	
+$(function IMUCHART() {
+
+		// We use an inline data source in the example, usually data would
+		// be fetched from a server
+		var data2 = [];
+		var data3 = [];
+		var data = [],
+			totalPoints = 300;
+		
+		function getRandomData() {
+
+			if (data.length > 0)
+				data = data.slice(1);
+
+			// Do a random walk
+
+			while (data.length < totalPoints) {
+
+				var prev = data.length > 0 ? data[data.length - 1] : 50,
+					y = prev + Math.random() * 10 - 5;
+
+				if (y < 0) {
+					y = 0;
+				} else if (y > 100) {
+					y = 100;
+				}
+					yAxisReadings=y;	
+				data.push(y);
+			}
+
+			// Zip the generated y values with the x values
+			
+			var xAxis= [];
+			for (var i = 0; i < data.length; ++i) {
+				xAxis.push([i, data[i]])
+			}
+
+			return xAxis;
+		}
+
+				function getRandomData2(){
+		if (data2.length > 0)
+				data2 = data2.slice(1);
+
+			// Do a random walk
+
+			while (data2.length < totalPoints) {
+
+				var prev2 = data2.length > 0 ? data2[data2.length - 1] : 50,
+					x = prev2 + Math.random() * 10 - 5;
+
+				if (x < 0) {
+					x = 0;
+				} else if (x > 100) {
+					x = 100;
+				}
+				xAxisReadings=x;
+				data2.push(x);
+			}
+			var yAxis = [];
+			for (var i = 0; i < data2.length; ++i) {
+				yAxis.push([i, data2[i]])
+			}
+			return yAxis;
+		}
+		/////////////////
+		function getRandomData3(){
+		if (data3.length > 0)
+				data3 = data3.slice(1);
+
+			// Do a random walk
+
+			while (data3.length < totalPoints) {
+
+				var prev3 = data3.length > 0 ? data3[data3.length - 1] : 50,
+					z = prev3 + Math.random() * 10 - 5;
+
+				if (z < 0) {
+					z = 0;
+				} else if (z > 100) {
+					z = 100;
+				}
+				zAxisReadings=z;
+				data3.push(z);
+			}
+			var zAxis = [];
+			for (var i = 0; i < data3.length; ++i) {
+				zAxis.push([i, data3[i]])
+			}
+			return zAxis;
+		}
+		
+		
+		// Set up the control widget
+
+		var updateInterval = 300;
+		$("#updateInterval").val(updateInterval).change(function () {
+			var v = $(this).val();
+			if (v && !isNaN(+v)) {
+				updateInterval = +v;
+				if (updateInterval < 1) {
+					updateInterval = 1;
+				} else if (updateInterval > 2000) {
+					updateInterval = 2000;
+				}
+				$(this).val("" + updateInterval);
+			}
+		});
+
+		var plotI = $.plot("#IMUDiv", [ getRandomData(),getRandomData2(),getRandomData3() ], {
+			series: {
+				shadowSize: 0	// Drawing is faster without shadows
+			},
+			yaxis: {
+				min: 0,
+				max: 100
+			},
+			xaxis: {
+				show: false
+			}
+			
+			
+			
+		});
+		
+		
+
+		function update() {
+
+			plotI.setData([getRandomData(),getRandomData2(),getRandomData3() ]);
+
+			// Since the axes don't change, we don't need to call plot.setupGrid()
+
+			plotI.draw();
+			setTimeout(update, updateInterval);
+			document.getElementById("imuvalue").innerHTML = "Y-axis:" + parseInt(yAxisReadings).toString()+" X-axis: " + parseInt(xAxisReadings).toString()+" Z-axis: " + parseInt(zAxisReadings).toString()
+		}
+		
+		update();
+
+		// Add the Flot version string to the footer
+
+		$("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	$(function EMGCHART() {
+
+		// We use an inline data source in the example, usually data would
+		// be fetched from a server
+
+		var data = [],
+			totalPoints = 300;
+		
+		function getRandomData() {
+
+			if (data.length > 0)
+				data = data.slice(1);
+
+			// Do a random walk
+
+			while (data.length < totalPoints) {
+
+				var prev = data.length > 0 ? data[data.length - 1] : 50,
+					y = prev + (Math.random()%301 )* 10 - 5;
+
+				if (y < 0) {
+					y = 0;
+				} else if (y > 300) {
+					y = 300;
+				}
+					emgReadings=y;	
+				data.push(y);
+			}
+
+			// Zip the generated y values with the x values
+
+			var res = [];
+			for (var i = 0; i < data.length; ++i) {
+				res.push([i, data[i]])
+			}
+
+			return res;
+		}
+
+		// Set up the control widget
+
+		var updateInterval = 300;
+		$("#updateInterval").val(updateInterval).change(function () {
+			var v = $(this).val();
+			if (v && !isNaN(+v)) {
+				updateInterval = +v;
+				if (updateInterval < 1) {
+					updateInterval = 1;
+				} else if (updateInterval > 2000) {
+					updateInterval = 2000;
+				}
+				$(this).val("" + updateInterval);
+			}
+		});
+
+		var plotE = $.plot("#EMGDiv", [ getRandomData() ], {
+			series: {
+				shadowSize: 0	// Drawing is faster without shadows
+			},
+			yaxis: {
+				min: 0,
+				max: 300
+			},
+			xaxis: {
+				show: false
+			}
+			
+			
+			
+		});
+		
+		
+
+		function update() {
+
+			plotE.setData([getRandomData()]);
+
+			// Since the axes don't change, we don't need to call plot.setupGrid()
+
+			plotE.draw();
+			setTimeout(update, updateInterval);
+			document.getElementById("emgvalue").innerHTML = "EMG:" + parseInt(emgReadings).toString()
+		}
+		
+		update();
+
+		// Add the Flot version string to the footer
+
+		$("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+	});
+	
+
+
+function check(){
+var str="";
+var  Force = document.getElementById('ForceDiv').style;
+var  EMG = document.getElementById('EMGDiv').style;
+var IMU = document.getElementById('IMUDiv').style;
+
+var emgBigDiv=document.getElementById('emgBig').style;
+var imuBigDiv=document.getElementById('imuBig').style;
+var forceBigDiv=document.getElementById('ForceBig').style;
+
+var EMGRead =document.getElementById('emgvalue').style;
+var IMURead = document.getElementById('imuvalue').style;
+var ForceRead = document.getElementById('forcevalue').style;
+	//stores string to variable string for selection check
+		if(document.getElementById('EMGCheckbox').checked){
+		str=str+"E";
+		
+		}
+	
+		if(document.getElementById('ForceCheckbox').checked){
+		str=str+"F";
+		}
+	
+		if(document.getElementById("IMUCheckbox").checked){
+		str=str+"I";
+		}
+	
+		//selection check
+		if (str=="E"){
+		
+		
+		Force.display = "none";
+		
+		forceBigDiv.display = "none";
+		forcevalue.display = "none";
+		IMU.display = "none";	
+		imuBigDiv.display = "none";	
+		imuvalue.display = "none";	
+		
+		EMG.display = "block";
+		emgBigDiv.display = "block";
+		EMGRead.display = "block";
+		
+		emgBigDiv.width = 1055 +"px";
+		emgBigDiv.height = 546 +"px";
+		EMG.width = 1055 +"px";
+		EMG.height = 516 +"px";
+		
+       		emgBigDiv.top = 103+"px";
+		
+		
+		
+		
+		
+        }
+    
+		if (str=="EF"){
+		
+		
+		IMU.display = "none";		
+		imuBigDiv.display = "none";
+		IMURead.display = "none";	
+		
+		emgBigDiv.display = "block";
+		EMG.display = "block";
+		EMGRead.display = "block";
+		
+		Force.display = "block";
+		forceBigDiv.display = "block";
+		ForceRead.display = "block";
+		
+		
+        	emgBigDiv.top = 103 + "px";
+		EMG.width = 1055 + "px";
+		EMG.height = 246  + "px";
+		EMGRead.width = 1055 + "px";		
+		emgBigDiv.height = 276  + "px";
+
+		forceBigDiv.top =  383 + "px";
+		Force.width = 1055 + "px";
+		Force.height = 246  + "px";
+		
+		}
+		if (str=="EI"){
+	
+		
+		Force.display = "none";
+		forceBigDiv.display = "none";	
+		ForceRead.display = "none";	
+		
+		
+		EMG.display = "block";
+		emgBigDiv.display = "block";
+		EMGRead.display = "block";
+		
+		
+		IMU.display = "block";
+		imuBigDiv.display = "block";
+		IMURead.display = "block";
+		
+		
+        	emgBigDiv.top = 103 + "px";
+		EMG.width = 1055+ "px";
+		EMG.height =  246   + "px";
+		EMGRead.width = 1055+ "px";
+		emgBigDiv.width = 1055+ "px";	
+		emgBigDiv.height =  276   + "px";
+		
+		imuBigDiv.top =  383 + "px";
+		IMU.width = 1055 + "px";
+		IMU.height =  246   + "px";
+		imuBigDiv.width = 1055+ "px";	
+		IMURead.width = 1055+ "px";
+		imuBigDiv.height =  276   + "px";
+		imuBigDiv.left = 305+"px";
+
+		}
+		
+		if (str=="EFI"){
+		
+		
+		Force.display = "block";
+		forceBigDiv.display = "block";
+		ForceRead.display = "block";	
+		
+		EMG.display = "block";
+		emgBigDiv.display = "block";
+		EMGRead.display = "block";
+		
+		
+		IMU.display = "block";
+		imuBigDiv.display = "block";
+		IMURead.display = "block";
+
+		
+		
+		
+      	        emgBigDiv.top = 103 + "px";
+		EMG.width = 525 + "px";
+		EMG.height = 246 + "px";
+		EMGRead.width = 525 + "px";
+
+		imuBigDiv.top =  103 + "px";
+		IMU.width = 525 + "px";
+		IMU.height = 246+ "px";
+		IMURead.width = 525 + "px";
+		imuBigDiv.width = 525 + "px";
+		imuBigDiv.left =  835 + "px";
+		
+		forceBigDiv.top =  383  + "px";
+		Force.width = 1055 + "px";
+		ForceRead.width = 1055 + "px";
+		Force.height = 246  + "px";
+		forceBigDiv.height = 276  + "px";
+		}
+		
+		if (str=="F"){
+			
+		EMG.display = "none";
+		emgBigDiv.display = "none";
+		EMGRead.display = "none";
+
+		
+		
+		IMU.display = "none";
+		imuBigDiv.display= "none";
+		IMURead.display= "none";
+		
+		Force.display = "block";
+		forceBigDiv.display = "block";
+		ForceRead.display = "block";
+		
+		
+		forceBigDiv.top =  103 + "px";
+		forceBigDiv.width = 1055 + "px";
+		forceBigDiv.height = 546  + "px";
+		ForceRead.width = 1055+"px";
+		Force.width = 1055 + "px";
+		Force.height = 516  + "px";
+		
+		
+		}
+		if (str=="FI"){
+		
+		
+		EMG.display = "none";
+		emgBigDiv.display = "none";
+		EMGRead.display = "none";
+		
+		IMU.display = "block";
+		imuBigDiv.display = "block";
+		IMURead.display = "block";
+		
+		Force.display = "block";	
+		forceBigDiv.display = "block";
+		ForceRead.display = "block";
+		
+		
+		
+		forceBigDiv.top =  383 + "px";
+		Force.width = 1055 + "px";
+		Force.height = 246  + "px";
+		forceBigDiv.width = 1055 + "px";
+		forceBigDiv.height = 276  + "px";
+
+
+		
+		imuBigDiv.top =  103 + "px";
+		IMU.width = 1055 + "px";
+		IMU.height = 246  + "px";
+		imuBigDiv.width = 1055 + "px";
+		imuBigDiv.height = 276  + "px";
+		imuBigDiv.left = 305+"px"
+		IMURead.width = 1055 + "px";
+		
+
+		}
+		if(str=="I"){
+		
+		
+		Force.display = "none";
+		forceBigDiv.display = "none";
+		ForceRead.display = "none";
+		
+		
+		EMG.display = "none";
+		emgBigDiv.display = "none";
+		EMGRead.display = "none";
+		
+		IMU.display = "block";
+		imuBigDiv.display = "block";
+		IMURead.display = "block";
+		
+		imuBigDiv.top =  103 + "px";
+		imuBigDiv.width = 1055 + "px";
+		imuBigDiv.height =  546  + "px";
+		IMURead.width = 1055+"px";
+		
+		IMU.width = 1055 + "px";
+		IMU.height =  516  + "px";
+		
+		
+		imuBigDiv.left= 305 +"px";
+		
+		
+		}
+	
+	EMGRead.resize(function () {
+			$(".message").text("Placeholder is now "
+				+ $(this).width() + "x" + $(this).height()
+				+ " pixels");
+		});
+
+	IMURead.resize(function () {
+			$(".message").text("Placeholder is now "
+				+ $(this).width() + "x" + $(this).height()
+				+ " pixels");
+		});
+
+	ForceRead.resize(function () {
+			$(".message").text("Placeholder is now "
+				+ $(this).width() + "x" + $(this).height()
+				+ " pixels");
+		});
+
+	
+}
+	</script>
+</head>
+<body id="sports" onload="init()" >
+<div id="wrapper">
+	<div id="top">
+    	<div id="login">
+            <form action="#" method="get">
+              <input type="text" value="username" name="q" size="10" id="username" title="username" onfocus="clearText(this)" onblur="clearText(this)" class="txt_field" />
+              <input type="password" value="password" name="q" size="10" id="password" title="password" onfocus="clearText(this)" onblur="clearText(this)" class="txt_field" />
+              <input type="submit" name="Search" value="" alt="Search" id="searchbutton" title="Search" class="sub_btn"  />
+            </form>
+		</div>
+    </div> <!-- end of top -->
+    
+  	<div id="templatemo_header">
+    	<div id="site_title"><h3>Sports Training</h3></div>
+        <div id="templatemo_menu" class="ddsmoothmenu">
+            <ul>
+              	<li><a id="indexTab" href="index.html" >Home</a></li>
+         		<li><a  id="sportsTab" href="sports.html" class="selected">Sports Training</a></li>
+              	<li><a id="chronicTab" href="chronic.html">Chronic Disease</a></li>
+              	<li><a id="stressTab" href="stress.html" >Stress Monitoring</a></li>
+            </ul>
+            <br style="clear: left" />
+        </div> <!-- end of templatemo_menu -->
+    </div> <!-- end of header -->
+	
+		<div id="emgBig">
+		<div id="emgvalue"><h4 id="showEmg">EMG:</h4></div>
+		<div id="EMGDiv" ></div>
+		</div>
+	 
+		<div id="ForceBig">
+		<div id="forcevalue"><h4 id="showForce">Force:</h4></div>
+		<div id="ForceDiv" ></div>
+		</div>
+		
+		<div id="imuBig">
+		<div id="imuvalue"><h4 id="showImu">IMU:</h4></div>
+		<div id="IMUDiv" ></div>
+		</div>
+		
+   
+   <div id="patientDetail">
+      <h4 style="position:relative; top:5px; left:3px">Patient's Detail</h6>
+        <table style="font-size:15px; font-family: Georgia, 'Times New Roman', Times, serif">
+        <tr>
+          <td><div id="avatarDiv"></div></td>
+        </tr>
+        <tr>
+          <td>Name: </td>
+          <td><div id="nameDiv"></div></td>
+        </tr>
+        <tr>
+            <td>ID: </td>
+          <td><div id="idDiv"></div></td>
+        </tr>
+        <tr>
+            <td>Age: </td>
+          <td><div id="ageDiv"></div></td>
+        </tr>
+        <tr>
+            <td>In Charge: </td>
+          <td><div id="inchargeDiv"></div></td>
+        </tr>
+         <tr>
+            <td>Department: </td>
+          <td><div id="deptDiv"></div></td>
+        </tr>
+      </table>
+	  <form>
+		
+		<div id="settings">
+       <input type="checkbox" id="EMGCheckbox"> EMG
+		<input type="checkbox" id="ForceCheckbox"> Force
+		<input type="checkbox" id="IMUCheckbox"> IMU<br>
+		<input type="button" onclick="check()" value="Save Settings">
+		
+		</div>
+		</form>
+    </div>
+    <div id="history">
+       <h4 style="position:relative; top:5px; left:3px">History</h6>
+    </div>
+    
+  
+</body>
+</html>

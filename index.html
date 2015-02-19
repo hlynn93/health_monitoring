@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>SnS Patient Monitoring</title>
+<meta name="keywords" content="graphite theme, professional, free templates, CSS, HTML" />
+<meta name="description" content="Graphite Theme, professional free CSS template from templatemo.com website" />
+<link href="css/templatemo_style.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="css/ddsmoothmenu.css" /> 
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script language="javascript" type="text/javascript">
+function clearText(field)
+{
+    if (field.defaultValue == field.value) field.value = '';
+    else if (field.value == '') field.value = field.defaultValue;
+}
+</script> 
+</head>
+<body onload="init()" id="home">
+<div id="templatemo_wrapper">
+	<div id="templatemo_top">
+    	<div id="templatemo_login">
+            <form action="#" method="get">
+              <input type="text" value="username" name="q" size="10" id="username" title="username" onfocus="clearText(this)" onblur="clearText(this)" class="txt_field" />
+              <input type="password" value="password" name="q" size="10" id="password" title="password" onfocus="clearText(this)" onblur="clearText(this)" class="txt_field" />
+              <input type="submit" name="Search" value="" alt="Search" id="searchbutton" title="Search" class="sub_btn"  />
+            </form>
+		</div>
+    </div> <!-- end of top -->
+    
+  	<div id="templatemo_header">
+    	<div id="site_title"><h1>SnS</h1></div>
+        <div id="templatemo_menu" class="ddsmoothmenu">
+            <ul>
+              	<li ><a id="indexTab" href="index.html" class="selected">Home</a></li>
+         		<li ><a id="sportsTab" href="sports.html">Sports Training</a></li>
+              	<li ><a id="chronicTab" href="chronic.html">Chronic Disease</a></li>
+              	<li ><a id="stressTab" href="stress.html">Stress Monitoring</a></li>
+            </ul>
+            <br style="clear: left" />
+        </div> <!-- end of templatemo_menu -->
+    </div> <!-- end of header -->
+
+    <div id="searchDiv">
+      <div id="searchBoxDiv">
+        <table>
+          <tr>
+            <td><input type="text" id="searchTextBox" style="width:200px;"></td>
+            <td><input type="button" class="button" onclick="displayDetail()"id="searchButotn" value="Search"></td>
+          </tr>
+        </table>
+      </div>
+      <div id="searchListDiv"><br>
+        <h5>Registered Patients</h5>
+        <select id="searchListBox" class="searchListFont" size="6" multiple style="left:2px" onchange="displayDetail()">
+          
+        </select>
+      </div>
+    </div>
+    <div id="searchResultDiv" style="visibility:hidden;color:#000000">
+      <table style="font-size:15px; font-family: Georgia, 'Times New Roman', Times, serif">
+        <tr>
+          <td><div id="avatarDiv"></div></td>
+        </tr>
+        <tr>
+          <td>Name: </td>
+          <td><div id="nameDiv"></div></td>
+        </tr>
+        <tr>
+            <td>ID: </td>
+          <td><div id="idDiv"></div></td>
+        </tr>
+        <tr>
+            <td>Age: </td>
+          <td><div id="ageDiv"></div></td>
+        </tr>
+        <tr>
+            <td>In Charge: </td>
+          <td><div id="inchargeDiv"></div></td>
+        </tr>
+         <tr>
+            <td>Department: </td>
+          <td><div id="deptDiv"></div></td>
+        </tr>
+      </table>
+    </div>
+    <div id="welcomeDiv">
+
+    </div>
+    
+    
+    
+  
+</body>
+<script>
+
+//Each patient data in JSON object
+var P10001 = [{Name: 'Han Lynn',
+              ID : 10001,
+              Age: 20,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Stress Monitoring', 'Sport Training'],
+              AvatarPath: 'images/patients/hanlynn.jpg'}];
+
+var P10002 = [{Name: 'Jun Hou',
+              ID : 10002,
+              Age: 30,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Sport Training'],
+              AvatarPath: 'images/patients/junhao.jpg'}];
+
+var P10003 = [{Name: 'Tan Yi Ning',
+              ID : 10003,
+              Age: 23,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Chronic Disease'],
+              AvatarPath: 'images/patients/yining.jpg'}];
+
+
+var patientArray = ["Han Lynn", "Jun Hou","Tan Yi Ning"];
+var patientDetail = [P10001, P10002, P10003]; //array of patient list
+
+function init(){
+  createListBox("searchListBox", patientArray);
+}
+
+//Search box auto complete function
+$(function() {
+    $( "#searchTextBox" ).autocomplete({
+      source: patientArray
+    });
+  });
+
+//Create the ListBox from the array input
+  function createListBox(listBoxId, array){
+    var x = document.getElementById(listBoxId);
+    
+    for(var i=0;i<array.length;i++){
+      var option = document.createElement("option");
+      option.text = array[i];
+      option.value = i;
+      try{
+        x.add(option,x.option[null]);
+      }catch(e){
+        x.add(option,null)
+      }
+    }
+  }
+
+  function changeHref(divId, value){
+    document.getElementById(divId).href = value;
+  }
+
+  function addText(divID, text){
+    document.getElementById(divID).innerHTML = text;
+  }
+
+  //add or change the HyperText and passes the ID of the patient
+  function addHyperText(divID, array){
+    var x = document.getElementById(divID);
+    x.innerHTML = "";
+    for(var i=0;i<array.length;i++){
+      if(i>0)
+        x.innerHTML = x.innerHTML + ", ";
+
+      if(array[i]=="Sport Training")
+         x.innerHTML = x.innerHTML + array[i].link("sports.html?pId="+document.getElementById("idDiv").innerHTML);
+      else if(array[i]=="Chronic Disease")
+         x.innerHTML = x.innerHTML + array[i].link("chronic.html?pId="+document.getElementById("idDiv").innerHTML);
+      else if(array[i]=="Stress Monitoring")
+         x.innerHTML = x.innerHTML + array[i].link("stress.html?pId="+document.getElementById("idDiv").innerHTML);
+    }
+  }
+  function showImage(divID, imageURL){
+    document.getElementById(divID).innerHTML = "<img src=" + "'" + imageURL + "'" + "/>";
+  }
+
+  //call this function when the patient is not found
+  function resetData(){
+      addText("avatarDiv", "No information available");
+      addText("nameDiv", "N/A");
+      addText("idDiv", "N/A");
+      addText("ageDiv","N/A");
+      addText("inchargeDiv", "N/A");
+      addText("deptDiv", "N/A");
+  }
+
+  //display the patient detail in the div
+  function displayDetail(){
+    var index;
+    if(document.getElementById("searchListBox").value != "") //check from the listBox
+       index = document.getElementById("searchListBox").value
+
+    else if(document.getElementById("searchTextBox").value != ""){ //check from the textBox
+      var text = document.getElementById("searchTextBox").value;
+      for(var i=0;i<patientArray.length;i++){
+        if(patientArray[i] == text){
+          index = i;
+        }
+      }
+      
+    }
+    if(index == null){
+        alert("no match found");
+        resetData();
+      }
+    else{
+      document.getElementById("searchResultDiv").style.visibility = "visible";
+      if(index>=patientDetail.length){ 
+        resetData();
+      }else{
+        showImage("avatarDiv", patientDetail[index][0].AvatarPath)
+        addText("nameDiv", patientDetail[index][0].Name);
+        addText("idDiv", patientDetail[index][0].ID);
+        addText("ageDiv", patientDetail[index][0].Age);
+        addText("inchargeDiv", patientDetail[index][0].InCharge);
+        addHyperText("deptDiv", patientDetail[index][0].Department);
+        changeHref("stressTab","stress.html?pId="+ (patientDetail[index][0].ID).toString());
+        changeHref("sportsTab","sports.html?pId="+ (patientDetail[index][0].ID).toString());
+        changeHref("chronicTab","chronic.html?pId="+ (patientDetail[index][0].ID).toString());
+      }
+    }
+
+  }
+
+</script>
+</html>

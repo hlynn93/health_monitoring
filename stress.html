@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Stress Monitoring System</title>
+<meta name="keywords" content="graphite theme, professional, free templates, CSS, HTML" />
+<meta name="description" content="Graphite Theme, professional free CSS template from templatemo.com website" />
+<link href="css/stress.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="smoothie.js"></script>
+<link rel="stylesheet" type="text/css" href="css/ddsmoothmenu.css" /> 
+<script language="javascript" type="text/javascript">
+function clearText(field)
+{
+    if (field.defaultValue == field.value) field.value = '';
+    else if (field.value == '') field.value = field.defaultValue;
+}
+</script> 
+</head>
+<body id="stressBody" onload="init()">
+<div id="wrapper">
+	<div id="top">
+    	<div id="login">
+            <form action="#" method="get">
+              <input type="text" value="username" name="q" size="10" id="username" title="username" onfocus="clearText(this)" onblur="clearText(this)" class="txt_field" />
+              <input type="password" value="password" name="q" size="10" id="password" title="password" onfocus="clearText(this)" onblur="clearText(this)" class="txt_field" />
+              <input type="submit" name="Search" value="" alt="Search" id="searchbutton" title="Search" class="sub_btn"  />
+            </form>
+		</div>
+    </div> <!-- end of top -->
+    
+  	<div id="templatemo_header">
+    	<div id="site_title"><h3>Stress Monitor</h3></div>
+        <div id="templatemo_menu" class="ddsmoothmenu">
+            <ul>
+              <li ><a id="indexTab" href="index.html" >Home</a></li>
+            <li ><a id="sportsTab" href="sports.html">Sports Training</a></li>
+                <li ><a id="chronicTab" href="chronic.html">Chronic Disease</a></li>
+                <li ><a id="stressTab" href="stress.html" class="selected">Stress Monitoring</a></li>
+            </ul>
+            <br style="clear: left" />
+        </div> <!-- end of templatemo_menu -->
+    </div> <!-- end of header -->
+
+    <div id="patientDetail">
+      <h4 style="position:relative; top:5px; left:3px">Patient's Detail</h6>
+        <table style="font-size:15px; font-family: Georgia, 'Times New Roman', Times, serif">
+        <tr>
+          <td><div id="avatarDiv"></div></td>
+        </tr>
+        <tr>
+          <td>Name: </td>
+          <td><div id="nameDiv"></div></td>
+        </tr>
+        <tr>
+            <td>ID: </td>
+          <td><div id="idDiv"></div></td>
+        </tr>
+        <tr>
+            <td>Age: </td>
+          <td><div id="ageDiv"></div></td>
+        </tr>
+        <tr>
+            <td>In Charge: </td>
+          <td><div id="inchargeDiv"></div></td>
+        </tr>
+         <tr>
+            <td>Department: </td>
+          <td><div id="deptDiv"></div></td>
+        </tr>
+      </table>
+    </div>
+    <div id="history">
+       <h4 style="position:relative; top:5px; left:3px">History</h6>
+        <table>
+          <tr>
+              <td><tr></tr></td>
+          </tr>
+        </table>
+    </div>
+    <div id="pulseGraph">
+       <table><tr>
+       <td><h3 id="pulseLabel" style="position:relative; top:5px; left:3px">Pulse Rate: </h3></td>
+      </tr><tr>
+       <td><canvas id="pulseCanvas" width="1000px" height="200px" style="position:relative; left:25px"></canvas></td>
+      </tr></table>
+    </div>
+    <div id="gsrGraph">
+      <table><tr>
+       <td><h3 id="gsrLabel" style="position:relative; top:5px; left:3px">GSR Level: </h3></td>
+      </tr><tr>
+       <td><canvas id="gsrCanvas" width="1000px" height="200px" style="position:relative; left:25px"></canvas></td>
+      </tr></table>
+    </div>
+  
+<script type="text/javascript">
+
+  var patientArray = ["Han Lynn", "Jun Hou", "Tan Yi Ning"];
+  var pId;
+
+  var pulseChart = new SmoothieChart({
+    grid:{
+      lineWidth: 1, verticalSections: 5 }
+  }); 
+
+  var pulseLine1 = new TimeSeries();
+  var pulseValue;
+  var pulseText = "Pulse Rate: ";
+
+  var gsrChart = new SmoothieChart({
+    grid:{
+      lineWidth: 1, verticalSections: 5 }
+  }); 
+  var gsrLine1 = new TimeSeries();
+  var gsrValue;
+  var gsrText = "GSR Level: "
+ 
+  var patientId;
+  var index;
+  
+  
+
+  var P10001 = [{Name: 'Han Lynn',
+              ID : 10001,
+              Age: 20,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Stress Monitoring', 'Sport Training'],
+              AvatarPath: 'images/patients/hanlynn.jpg'}];
+
+  var P10002 = [{Name: 'Jun Hou',
+              ID : 10002,
+              Age: 30,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Sport Training'],
+              AvatarPath: 'images/patients/junhao.jpg'}];
+
+  var P10003 = [{Name: 'Tan Yi Ning',
+              ID : 10003,
+              Age: 23,
+              InCharge : 'Dr. Ge Yu',
+              Department : ['Chronic Disease'],
+              AvatarPath: 'images/patients/yining.jpg'}];
+
+
+  var patientDetail = [P10001, P10002, P10003];
+ 
+//extract the patient ID (pID) from the URL link
+ function getParam( name )
+{
+ name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+ var regexS = "[\\?&]"+name+"=([^&#]*)";
+ var regex = new RegExp( regexS );
+ var results = regex.exec( window.location.href );
+ if( results == null )
+  return "";
+else
+ return results[1];
+}
+
+  function init(){
+    patientId = getParam('pId');
+    index =  patientId - 10001; //get the index of the patient array
+    if(patientId <10000){
+      alert("Please choose a patient to get access to this page.");
+      self.location='index.html';
+    }
+    else{
+      for(var i=0; i<patientDetail[index][0].Department.length;i++){
+        var text = patientDetail[index][0].Department[index];
+        if(text == document.getElementById("stressTab").text){
+          displayDetail(); return;
+        }
+      }
+      alert("The patient does not take this package");
+      self.location="index.html";
+    }
+  }
+
+  function addText(divID, text){
+    document.getElementById(divID).innerHTML = text;
+  }
+
+  function addHyperText(divID, array){
+    var x = document.getElementById(divID);
+    x.innerHTML = "";
+    for(var i=0;i<array.length;i++){
+      if(i>0)
+        x.innerHTML = x.innerHTML + ", ";
+
+      if(array[i]=="Sport Training")
+         x.innerHTML = x.innerHTML + array[i].link("sports.html?pId="+document.getElementById("idDiv").innerHTML);
+      else if(array[i]=="Chronic Disease")
+         x.innerHTML = x.innerHTML + array[i].link("chronic.html?pId="+document.getElementById("idDiv").innerHTML);
+      else if(array[i]=="Stress Monitoring")
+         x.innerHTML = x.innerHTML + array[i].link("stress.html?pId="+document.getElementById("idDiv").innerHTML);
+    }
+  }
+
+
+  function showImage(divID, imageURL){
+    document.getElementById(divID).innerHTML = "<img src=" + "'" + imageURL + "'" + "/>";
+  }
+  
+
+  function resetData(){
+      addText("nameDiv", "N/A");
+      addText("idDiv", "N/A");
+      addText("ageDiv","N/A");
+      addText("inchargeDiv", "N/A");
+      addText("deptDiv", "N/A");
+  }
+
+//change the href of a link
+  function changeHref(divId, value){
+    document.getElementById(divId).href = value;
+  }
+
+//Display the patient's detail and show the graphs
+  function displayDetail(){
+
+    
+    if(index>=patientDetail.length){ //check whether the patient is in the registered list
+      addText("avatarDiv", "No information available");
+      resetData();
+    }else{
+      showImage("avatarDiv", patientDetail[index][0].AvatarPath)
+      addText("nameDiv", patientDetail[index][0].Name);
+      addText("idDiv", patientDetail[index][0].ID);
+      addText("ageDiv", patientDetail[index][0].Age);
+      addText("inchargeDiv", patientDetail[index][0].InCharge);
+      addHyperText("deptDiv", patientDetail[index][0].Department);
+      changeHref("stressTab","stress.html?pId="+ (patientDetail[index][0].ID).toString());
+      changeHref("sportsTab","sports.html?pId="+ (patientDetail[index][0].ID).toString());
+      changeHref("chronicTab","chronic.html?pId="+ (patientDetail[index][0].ID).toString());
+    }
+    showGSR();
+    showPulse();
+    
+  }
+
+//function to be called to show the pulse graph
+function showPulse(){
+    pulseChart.streamTo(document.getElementById("pulseCanvas"));
+    //Data
+    
+    setInterval(function(){
+      pulseValue = parseInt(Math.random() * 100);
+      if(pulseValue<50) pulseValue = pulseValue + 50;
+      pulseLine1.append(new Date().getTime(), pulseValue);
+      document.getElementById("pulseLabel").innerHTML = pulseText + pulseValue.toString();
+    },1000);
+
+    //add to smoothie chart
+    pulseChart.addTimeSeries(pulseLine1, {
+      strokeStyle:'rgb(0,255,0)', fillStyle:'rgba(0,255,0,0.2)', lineWidth:2});
+
+  }
+
+//function to be called to show the GSR graph
+function showGSR(){
+    gsrChart.streamTo(document.getElementById("gsrCanvas"));
+    //Data
+    setInterval(function(){
+      gsrValue = parseInt(Math.random() * 1000);
+      if(gsrValue>500) gsrValue = gsrValue - 500;
+      if (gsrValue<200) gsrValue = gsrValue + 200;
+      gsrLine1.append(new Date().getTime(), gsrValue);
+      document.getElementById("gsrLabel").innerHTML = gsrText + gsrValue.toString();
+    },1000);
+
+  //add to smoothie chart
+    gsrChart.addTimeSeries(gsrLine1, {
+      strokeStyle:'rgb(255,0,0)', fillStyle:'rgba(255,0,0,0.2)', lineWidth:2});
+  }
+
+
+  </script>
+    
+</body>
+</html>
